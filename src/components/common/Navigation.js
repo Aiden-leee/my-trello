@@ -24,7 +24,7 @@ export default function Navigation() {
     <>
       <HeaderBar>
         <Link to="/">
-          <span>Trello Style</span>
+          <span>My Trello</span>
         </Link>
       </HeaderBar>
     </>
