@@ -37,7 +37,7 @@ const List = styled.div`
       flex: 1 1 auto;
       overflow-y: auto;
       overflow-x: hidden;
-      min-height: 0;
+      min-height: 30px;
       padding: 10px 10px 0;
 
       > .list-card {
@@ -60,6 +60,7 @@ const List = styled.div`
           > .img {
             height: 150px;
             background-size: cover;
+            background-position: 50%;
             border-radius: 5px;
           }
           > img {
@@ -96,6 +97,7 @@ const List = styled.div`
       > .add {
         display: flex;
         flex-direction: row-reverse;
+        color: #808080;
       }
     }
   }
@@ -104,15 +106,18 @@ const ListCard = ({ data }) => {
   console.log(data);
 
   useEffect(() => {
+    let list = Array.from(document.querySelectorAll(".list"));
     let listContent = Array.from(document.querySelectorAll(".list-content"));
-    Dragula([...listContent]);
+    let options = {};
+    console.log(list);
+    Dragula([...listContent], options);
   }, []);
 
   return (
     <>
       {data.map((item) => {
         return (
-          <List key={item.id}>
+          <List key={item.id} className="list">
             <div className="list-wrap">
               <div className="list-title">{item.title}</div>
               <div className="list-content">
@@ -154,7 +159,7 @@ const ListCard = ({ data }) => {
               </div>
               <div className="list-bottom">
                 <div className="add">
-                  <AddBoxIcon></AddBoxIcon>
+                  <AddBoxIcon style={{ cursor: "pointer" }}></AddBoxIcon>
                 </div>
               </div>
             </div>

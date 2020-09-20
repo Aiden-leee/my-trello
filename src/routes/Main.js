@@ -20,7 +20,7 @@ const Main = () => {
       content: [
         {
           id: 1,
-          img: "https://source.unsplash.com/user/erondu/1600x900",
+          img: "https://source.unsplash.com/user/erondu/500x900",
           text: "어서오세요 환영합니다",
         },
       ],
