@@ -27,11 +27,13 @@ const List = styled.div`
     user-select: none;
     > .list-title {
       padding: 10px;
-      overflow: hidden;
       font-size: 14px;
       color: #383838;
-      text-overflow: ellipsis;
       border-bottom: 1px solid #eaeaea;
+      > h2 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
     > .list-content {
       flex: 1 1 auto;
@@ -98,13 +100,15 @@ const List = styled.div`
         display: flex;
         flex-direction: row-reverse;
         color: #808080;
+        > svg {
+          cursor: pointer;
+        }
       }
     }
   }
 `;
 const ListCard = ({ data }) => {
   console.log(data);
-
   useEffect(() => {
     let list = Array.from(document.querySelectorAll(".list"));
     let listContent = Array.from(document.querySelectorAll(".list-content"));
@@ -119,7 +123,9 @@ const ListCard = ({ data }) => {
         return (
           <List key={item.id} className="list">
             <div className="list-wrap">
-              <div className="list-title">{item.title}</div>
+              <div className="list-title">
+                <h2>{item.title}</h2>
+              </div>
               <div className="list-content">
                 {item.content.map((content) => {
                   return (
@@ -129,7 +135,6 @@ const ListCard = ({ data }) => {
                           className="img"
                           style={{ backgroundImage: `url(${content.img})` }}
                         ></div>
-                        {/* <img src={content.img} alt="" /> */}
                       </div>
                       <div className="list-text">{content.text}</div>
                       <div className="list-badges">
@@ -159,7 +164,7 @@ const ListCard = ({ data }) => {
               </div>
               <div className="list-bottom">
                 <div className="add">
-                  <AddBoxIcon style={{ cursor: "pointer" }}></AddBoxIcon>
+                  <AddBoxIcon></AddBoxIcon>
                 </div>
               </div>
             </div>
