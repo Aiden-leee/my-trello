@@ -150,7 +150,7 @@ const ListCard = ({ data }) => {
     <>
       {isModalVisible && (
         <Modal visible={isModalVisible} close={closeModal} header="Create Card">
-          <CreateCard data={isCurrentItem}></CreateCard>
+          <CreateCard data={isCurrentItem} close={closeModal}></CreateCard>
         </Modal>
       )}
       {list.length > 0 &&
