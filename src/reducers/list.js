@@ -1,13 +1,18 @@
 const GET_DATA = "GET_DATA";
 
-const initialState = {
-  title: "",
+export const addList = (data) => {
+  return {
+    type: GET_DATA,
+    data,
+  };
 };
+
+const initialState = [];
 
 export const list = (state = initialState, action) => {
   switch (action.type) {
     case GET_DATA:
-      return state;
+      return [...state, action.data];
     default:
       return state;
   }

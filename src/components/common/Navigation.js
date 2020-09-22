@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import QueueIcon from "@material-ui/icons/Queue";
 import Modal from "./Modal";
+import AddListForm from "../AddListForm";
 
 const HeaderBar = styled.div`
   position: relative;
@@ -12,6 +13,7 @@ const HeaderBar = styled.div`
   height: 56px;
   background: #529494;
   color: #fff;
+  z-index: 1;
   > a {
     display: flex;
     flex-direction: column;
@@ -47,7 +49,9 @@ export default function Navigation() {
   return (
     <>
       {isModalVisible && (
-        <Modal visible={isModalVisible} close={closeModal}></Modal>
+        <Modal visible={isModalVisible} close={closeModal} header="Add List">
+          <AddListForm close={closeModal}></AddListForm>
+        </Modal>
       )}
       <HeaderBar>
         <Link to="/">

@@ -8,6 +8,7 @@ html {
 }
 
 body {
+  min-width: 380px;
   height: 100%;
   line-height: normal;
 }
@@ -105,6 +106,7 @@ button:focus:before, button:active:before {
 .list-card > .list-image > .img {
   height: 150px;
   background-size: cover;
+  background-position: 50%;
   border-radius: 5px;
 }
 

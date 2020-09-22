@@ -1,10 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import SubjectIcon from "@material-ui/icons/Subject";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import Dragula from "react-dragula";
 import "dragula/dist/dragula.css";
+import emptyImg from "../assets/img/empty.jpg";
+import Modal from "./common/Modal";
+import CreateCard from "./CreateCard";
 
 const materialIconStyle = {
   color: "#bbb",
@@ -99,114 +102,121 @@ const List = styled.div`
       > .add {
         display: flex;
         flex-direction: row-reverse;
-        color: #808080;
+
         > svg {
+          color: #808080;
           cursor: pointer;
+          &:hover {
+            color: #6d6d6d;
+          }
         }
       }
     }
   }
 `;
-const ListCard = ({ data }) => {
-  console.log(data);
-  useEffect(() => {
-    let list = Array.from(document.querySelectorAll(".list"));
-    let listContent = Array.from(document.querySelectorAll(".list-content"));
-    let options = {};
-    console.log(list);
-    Dragula([...listContent], options);
-  }, []);
 
+let drake = null;
+const initDragula = () => {
+  let list = Array.from(document.querySelectorAll(".list"));
+  let listContent = Array.from(document.querySelectorAll(".list-content"));
+  let options = {};
+  drake = Dragula([...listContent], options);
+};
+
+const ListCard = ({ data }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isCurrentItem, setIsCurrentItem] = useState(null);
+  const { list } = data;
+
+  useEffect(() => {
+    initDragula();
+  }, []);
+  useEffect(() => {
+    drake.destroy();
+    initDragula();
+  }, [data]);
+
+  const openModal = (e, id) => {
+    let currentItem = list.find((item) => {
+      return item.id === id;
+    });
+    setIsCurrentItem(currentItem);
+    setIsModalVisible(!isModalVisible);
+  };
+  const closeModal = (v) => {
+    setIsModalVisible(v);
+  };
   return (
     <>
-      {data.map((item) => {
-        return (
-          <List key={item.id} className="list">
-            <div className="list-wrap">
-              <div className="list-title">
-                <h2>{item.title}</h2>
-              </div>
-              <div className="list-content">
-                {item.content.map((content) => {
-                  return (
-                    <div className="list-card" key={content.id}>
-                      <div className="list-image">
-                        <div
-                          className="img"
-                          style={{ backgroundImage: `url(${content.img})` }}
-                        ></div>
+      {isModalVisible && (
+        <Modal visible={isModalVisible} close={closeModal} header="Create Card">
+          <CreateCard data={isCurrentItem}></CreateCard>
+        </Modal>
+      )}
+      {list.length > 0 &&
+        list.map((item) => {
+          return (
+            <List key={item.id}>
+              <div className="list-wrap">
+                <div className="list-title">
+                  <h2>{item.title}</h2>
+                </div>
+                <div className="list-content">
+                  {item.content.map((content) => {
+                    return (
+                      <div className="list-card" key={content.id}>
+                        <div className="list-image">
+                          {content.img !== "" ? (
+                            <div
+                              className="img"
+                              style={{ backgroundImage: `url(${content.img})` }}
+                            ></div>
+                          ) : (
+                            <div
+                              className="img empty"
+                              style={{ backgroundImage: `url(${emptyImg})` }}
+                            ></div>
+                          )}
+                        </div>
+                        <div className="list-text">{content.des}</div>
+                        <div className="list-badges">
+                          {content.des && (
+                            <div className="badge">
+                              <span>
+                                <SubjectIcon
+                                  style={materialIconStyle}
+                                ></SubjectIcon>
+                              </span>
+                            </div>
+                          )}
+                          {content.img && (
+                            <div className="badge">
+                              <span>
+                                <AttachFileIcon
+                                  style={materialIconStyle}
+                                ></AttachFileIcon>
+                              </span>
+                              {/* <span className="attachCount">1</span> */}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="list-text">{content.text}</div>
-                      <div className="list-badges">
-                        {content.text && (
-                          <div className="badge">
-                            <span>
-                              <SubjectIcon
-                                style={materialIconStyle}
-                              ></SubjectIcon>
-                            </span>
-                          </div>
-                        )}
-                        {content.img && (
-                          <div className="badge">
-                            <span>
-                              <AttachFileIcon
-                                style={materialIconStyle}
-                              ></AttachFileIcon>
-                            </span>
-                            <span className="attachCount">1</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="list-bottom">
-                <div className="add">
-                  <AddBoxIcon></AddBoxIcon>
+                    );
+                  })}
+                </div>
+                <div className="list-bottom">
+                  <div className="add">
+                    <AddBoxIcon
+                      onClick={(e) => openModal(e, item.id)}
+                    ></AddBoxIcon>
+                  </div>
                 </div>
               </div>
-            </div>
-          </List>
-        );
-      })}
+            </List>
+          );
+        })}
     </>
   );
 };
 
 export default ListCard;
-
-{
-  /* <List>
-        <div className="list-wrap">
-          <div className="list-title">
-            첫번째 목록 첫번째 목록 첫번째 목록 첫번째 목록
-          </div>
-          <div className="list-content">
-            <div className="list-card">
-              <div className="list-image">
-                <img
-                  src="https://source.unsplash.com/user/erondu/1600x900"
-                  alt=""
-                />
-              </div>
-              <div className="list-text">어서오세요 환영합니다.</div>
-              <div className="list-badges">
-                <div className="badge">
-                  <span>
-                    <SubjectIcon style={materialIconStyle}></SubjectIcon>
-                  </span>
-                </div>
-                <div className="badge">
-                  <span>
-                    <AttachFileIcon style={materialIconStyle}></AttachFileIcon>
-                  </span>
-                  <span className="attachCount">1</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </List> */
-}

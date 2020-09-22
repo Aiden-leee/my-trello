@@ -9,8 +9,11 @@ import "../../assets/css/init.css";
 const Wrap = styled.div`
   position: absolute;
   width: 100%;
-  height: calc(100% - 56px);
-  border: 1px solid #eaeaea;
+  height: 100%;
+  left: 0;
+  top: 0;
+  min-width: 380px;
+
   background: #eaeaea;
   box-sizing: border-box;
 `;
