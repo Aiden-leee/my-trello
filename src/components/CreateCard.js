@@ -93,6 +93,7 @@ const CreateCard = ({ data, close }) => {
     const card = {
       id: Date.now(),
       img: isBase64,
+      imgName: imgFile,
       des,
     };
     data.content.push(card);

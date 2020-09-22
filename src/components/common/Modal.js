@@ -63,6 +63,7 @@ const ModalBody = styled.div`
   flex: 1 1 auto;
   padding: 10px 10px 48px;
   text-align: center;
+  overflow: auto;
 `;
 const cancelStyle = {
   color: "#fff",

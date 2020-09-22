@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { connect } from "react-redux";
-import { addList } from "../reducers/list";
 
 import IconButton from "@material-ui/core/IconButton";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
+
+const Wrap = styled.div`
+  display: inline-block;
+  flex-direction: column;
+`;
+const ImgView = styled.div`
+  width: 100%;
+  height: 150px;
+  background-size: contain;
+  background-position: 50%;
+  background-repeat: no-repeat;
+`;
 
 const ButtonBox = styled.div`
   width: 100%;
@@ -12,6 +22,9 @@ const ButtonBox = styled.div`
   left: 0;
   bottom: 0;
   margin-bottom: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #efefef;
+  background: #fff;
 `;
 
 const ButtonWrap = styled.div`
@@ -33,10 +46,9 @@ const Button = styled.button`
   &:not(:disabled):hover {
     filter: brightness(1.1);
   }
-`;
-
-const Form = styled.form`
-  display: inline-block;
+  &:not(:first-child) {
+    margin-left: 5px;
+  }
 `;
 const FormUIbox = styled.div`
   display: flex;
@@ -53,7 +65,6 @@ const FormUIbox = styled.div`
 
 const InputUI = styled.input`
   border: 0;
-  border-bottom: 1px solid #ddd;
   background-color: #fff;
   height: 30px;
 `;
@@ -65,16 +76,29 @@ const InputReadOnly = styled.input`
   height: 30px;
 `;
 
-const AddListForm = ({ close, addList }) => {
-  const [title, setTitle] = useState("");
-  const [imgFile, setImgFile] = useState("");
-  const [isBase64, setIsBase64] = useState("");
-  const [des, setDes] = useState("");
+const ViewCard = ({ data, close }) => {
+  const { img, des, imgName } = data;
+  const [isEdit, setIsEdit] = useState(false);
+  const [description, setDescription] = useState(des);
 
-  const handleChangeTitle = (e) => {
-    setTitle(e.target.value);
+  const [imgFile, setImgFile] = useState(imgName);
+  const [isBase64, setIsBase64] = useState(img);
+  const editCard = () => {
+    setIsEdit(!isEdit);
   };
-
+  const editSave = () => {
+    const edit = {
+      id: Date.now(),
+      img: isBase64,
+      imgName: imgFile,
+      des: description,
+    };
+    Object.assign(data, edit);
+    close(false);
+  };
+  const handleInputChange = (e) => {
+    setDescription(e.target.value);
+  };
   const handleChangeImg = (e) => {
     setImgFile(e.target.files[0].name);
     setIsBase64(e.target.files[0]);
@@ -87,45 +111,12 @@ const AddListForm = ({ close, addList }) => {
     };
     if (e.target.files[0]) {
       reader.readAsDataURL(e.target.files[0]); // 1. 파일을 읽어 버퍼에 저장합니다.
-      //   setImgFile(e.target.files[0]); // 파일 상태 업데이트
+      // setImgFile(e.target.files[0]); // 파일 상태 업데이트
     }
   };
-
-  const handleDescription = (e) => {
-    setDes(e.target.value);
-  };
-
-  const submitForm = (e) => {
-    e.preventDefault();
-    const data = {
-      id: Date.now(),
-      title,
-      content: [
-        {
-          id: Date.now(),
-          img: isBase64,
-          imgName: imgFile,
-          des,
-        },
-      ],
-    };
-    addList(data);
-    close(false);
-  };
-
-  return (
-    <>
-      <Form onSubmit={submitForm} autoComplete="off">
-        <FormUIbox>
-          <span className="title">Title</span>
-          <InputUI
-            type="text"
-            id="ipt01"
-            value={title}
-            onChange={handleChangeTitle}
-          />
-        </FormUIbox>
-
+  const EditCamera = () => {
+    return (
+      <>
         <FormUIbox>
           <span className="title">Attachments</span>
           <InputReadOnly type="text" readOnly value={imgFile} disabled />
@@ -146,26 +137,42 @@ const AddListForm = ({ close, addList }) => {
             </IconButton>
           </label>
         </FormUIbox>
-
+      </>
+    );
+  };
+  return (
+    <>
+      <Wrap>
+        {isEdit ? (
+          <EditCamera />
+        ) : (
+          <ImgView
+            className="img"
+            style={{ backgroundImage: `url(${isBase64})` }}
+          ></ImgView>
+        )}
         <FormUIbox>
-          <span className="title">Description</span>
-          <InputUI type="text" value={des} onChange={handleDescription} />
+          {isEdit && <span className="title">Description</span>}
+
+          <InputUI
+            value={description}
+            onChange={handleInputChange}
+            disabled={!isEdit}
+          />
         </FormUIbox>
 
         <ButtonBox>
           <ButtonWrap>
-            <Button type="submit" bg={"#f7a917"} disabled={!title}>
-              add
+            <Button type="button" bg={"#c1b998"} onClick={editCard}>
+              Edit
+            </Button>
+            <Button type="button" bg={"#f7a917"} onClick={editSave}>
+              Save
             </Button>
           </ButtonWrap>
         </ButtonBox>
-      </Form>
+      </Wrap>
     </>
   );
 };
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    addList: (data) => dispatch(addList(data)),
-  };
-};
-export default connect(null, mapDispatchToProps)(AddListForm);
+export default ViewCard;
