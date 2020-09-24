@@ -64,7 +64,6 @@ const InputReadOnly = styled.input`
 `;
 
 const CreateCard = ({ data, close }) => {
-  const { content } = data;
   const [imgFile, setImgFile] = useState("");
   const [isBase64, setIsBase64] = useState("");
   const [des, setDes] = useState("");

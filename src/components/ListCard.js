@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { connect } from "react-redux";
+import { removeData } from "../reducers/list";
+// component
+import CreateCard from "./CreateCard";
+import ViewCard from "./ViewCard";
+//material
 import SubjectIcon from "@material-ui/icons/Subject";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import AddBoxIcon from "@material-ui/icons/AddBox";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+// dragula
 import Dragula from "react-dragula";
 import "dragula/dist/dragula.css";
+// empty image
 import emptyImg from "../assets/img/empty.jpg";
+// modal
 import Modal from "./common/Modal";
-import CreateCard from "./CreateCard";
-import ViewCard from "./ViewCard";
 
 const materialIconStyle = {
   color: "#bbb",
@@ -34,6 +42,9 @@ const ListWrap = styled.div`
 `;
 
 const ListTitle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px;
   font-size: 14px;
   color: #383838;
@@ -41,6 +52,13 @@ const ListTitle = styled.div`
   > h2 {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  > svg {
+    color: #808080;
+    cursor: pointer;
+    &:hover {
+      color: #6d6d6d;
+    }
   }
 `;
 const ListContent = styled.div`
@@ -122,18 +140,50 @@ const ListBottom = styled.div`
 
 let drake = null;
 const initDragula = () => {
-  let list = Array.from(document.querySelectorAll(".list"));
+  // let list = Array.from(document.querySelectorAll(".list"));
   let listContent = Array.from(document.querySelectorAll(".list-content"));
-  let options = {};
-  drake = Dragula([...listContent], options);
+  drake = Dragula([...listContent]);
 };
 
-const ListCard = ({ data }) => {
+const dropDataChange = (data) => {
+  if (data) {
+    const { list } = data;
+
+    drake.on("drop", (el, target, source) => {
+      const id = el.attributes.data.value; // object
+      const prevListId = source.attributes.data.value; // 이전 list dom
+      const targetId = target.attributes.data.value; // drop dom
+      let drag, drop, dragIndex, dropItem;
+      // drag 이벤트를 실행한 List data
+      //   drag = list.find((v) => {
+      //     return Number(v.id) === Number(prevListId);
+      //   });
+      //   // drag object find index
+      //   dragIndex = drag.content.findIndex((tem) => {
+      //     return Number(tem.id) === Number(id);
+      //   });
+      //   // drop data
+      //   dropItem = drag.content.filter((item) => {
+      //     return Number(item.id) === Number(id);
+      //   });
+      //   // drag area remove
+      //   drag.content.splice(dragIndex, 1);
+      //   drop = list.find((v) => {
+      //     return Number(v.id) === Number(targetId);
+      //   });
+      //   // drop area add
+      //   drop.content.push(dropItem[0]);
+    });
+  }
+};
+
+const ListCard = ({ data, removeData }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isViewModal, setIsViewModal] = useState(false);
   const [isCurrentItem, setIsCurrentItem] = useState(null);
   const [isCurrent, setIsCurrent] = useState(null);
   const [headerName, setHeaderName] = useState("");
+  const [listId, setListId] = useState("");
   const { list } = data;
 
   useEffect(() => {
@@ -142,30 +192,39 @@ const ListCard = ({ data }) => {
   useEffect(() => {
     drake.destroy();
     initDragula();
+    dropDataChange(data);
   }, [data]);
 
   const openModal = (e, id) => {
     let currentItem = list.find((item) => {
       return item.id === id;
     });
+
     setHeaderName("Create Card");
     setIsCurrentItem(currentItem);
     setIsViewModal(false);
     setIsModalVisible(!isModalVisible);
   };
+
   const closeModal = (v) => {
     setIsModalVisible(v);
   };
+
   const viewModal = (e, item, id) => {
-    console.log(item.content);
     let current = item.content.find((card) => {
       return card.id === id;
     });
     setHeaderName("Card");
     setIsCurrent(current);
+    setListId(item.id);
     setIsViewModal(true);
     setIsModalVisible(!isModalVisible);
   };
+
+  const removeList = (e, id) => {
+    removeData(id);
+  };
+
   return (
     <>
       {isModalVisible && (
@@ -173,7 +232,12 @@ const ListCard = ({ data }) => {
           {!isViewModal ? (
             <CreateCard data={isCurrentItem} close={closeModal}></CreateCard>
           ) : (
-            <ViewCard data={isCurrent} close={closeModal}></ViewCard>
+            <ViewCard
+              currentdata={isCurrent}
+              listId={listId}
+              data={list}
+              close={closeModal}
+            ></ViewCard>
           )}
         </Modal>
       )}
@@ -182,16 +246,18 @@ const ListCard = ({ data }) => {
         list.map((item) => {
           return (
             <List key={item.id}>
-              <ListWrap className="list-wrap">
-                <ListTitle className="list-title">
+              <ListWrap>
+                <ListTitle>
                   <h2>{item.title}</h2>
+                  <DeleteForeverIcon onClick={(e) => removeList(e, item.id)} />
                 </ListTitle>
-                <ListContent className="list-content">
+                <ListContent className="list-content" data={item.id}>
                   {item.content.map((content) => {
                     return (
                       <ListCards
                         className="list-card"
                         key={content.id}
+                        data={content.id}
                         onDoubleClick={(e) => viewModal(e, item, content.id)}
                       >
                         <ListImage className="list-image">
@@ -232,7 +298,7 @@ const ListCard = ({ data }) => {
                     );
                   })}
                 </ListContent>
-                <ListBottom className="list-bottom">
+                <ListBottom>
                   <div className="add">
                     <AddBoxIcon
                       onClick={(e) => openModal(e, item.id)}
@@ -247,4 +313,10 @@ const ListCard = ({ data }) => {
   );
 };
 
-export default ListCard;
+const mapDispatchToProps = (dispatch, ownprops) => {
+  return {
+    removeData: (id) => dispatch(removeData(id)),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(ListCard);

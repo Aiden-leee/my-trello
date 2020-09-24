@@ -134,13 +134,6 @@ button:focus:before, button:active:before {
   height: 100%;
 }
 
-.list-card > .list-badges > .badge > span.attachCount {
-  font-size: 12px;
-  color: #aaa;
-  vertical-align: top;
-  line-height: 20px;
-}
-
 .cardtitle {
   float: left;
   width: 100%;

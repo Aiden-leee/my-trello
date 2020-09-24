@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-
+import { connect } from "react-redux";
+// material
 import IconButton from "@material-ui/core/IconButton";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
+// empty image
+import emptyImg from "../assets/img/empty.jpg";
+// reducer
+import { updateData, removeCardItem } from "../reducers/list";
 
 const Wrap = styled.div`
   display: inline-block;
@@ -76,8 +81,14 @@ const InputReadOnly = styled.input`
   height: 30px;
 `;
 
-const ViewCard = ({ data, close }) => {
-  const { img, des, imgName } = data;
+const ViewCard = ({
+  currentdata,
+  listId,
+  close,
+  updateData,
+  removeCardItem,
+}) => {
+  const { img, des, imgName } = currentdata;
   const [isEdit, setIsEdit] = useState(false);
   const [description, setDescription] = useState(des);
 
@@ -88,12 +99,17 @@ const ViewCard = ({ data, close }) => {
   };
   const editSave = () => {
     const edit = {
-      id: Date.now(),
+      id: currentdata.id,
       img: isBase64,
       imgName: imgFile,
       des: description,
     };
-    Object.assign(data, edit);
+
+    updateData(edit, listId);
+    close(false);
+  };
+  const removeCard = () => {
+    removeCardItem(currentdata.id, listId);
     close(false);
   };
   const handleInputChange = (e) => {
@@ -114,6 +130,11 @@ const ViewCard = ({ data, close }) => {
       // setImgFile(e.target.files[0]); // 파일 상태 업데이트
     }
   };
+  useEffect(() => {
+    if (isBase64 == "") {
+      // setIsBase64(emptyImg);
+    }
+  }, [isBase64]);
   const EditCamera = () => {
     return (
       <>
@@ -169,10 +190,20 @@ const ViewCard = ({ data, close }) => {
             <Button type="button" bg={"#f7a917"} onClick={editSave}>
               Save
             </Button>
+            <Button type="button" bg={"#d67373"} onClick={removeCard}>
+              Remove
+            </Button>
           </ButtonWrap>
         </ButtonBox>
       </Wrap>
     </>
   );
 };
-export default ViewCard;
+
+const mapDispatchToProps = (dispatch, ownprops) => {
+  return {
+    updateData: (id, listId) => dispatch(updateData(id, listId)),
+    removeCardItem: (id, listId) => dispatch(removeCardItem(id, listId)),
+  };
+};
+export default connect(null, mapDispatchToProps)(ViewCard);

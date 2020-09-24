@@ -79,7 +79,6 @@ const Modal = ({ visible, close, children, header }) => {
   };
   return (
     <>
-      {/* <ModalOverlay visible={visible} onClick={closeOverlay} /> */}
       <ModalWrap visible={visible} onClick={closeOverlay}>
         <Wrap>
           <ModalInnerBox>
